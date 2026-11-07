@@ -5,3 +5,4 @@ export * from './TarifaNoAplicable';
 export * from './LoteCorrupto';
 export * from './ParametrosInvalidos';
 export * from './TipoEstrategiaDesconocido';
+export * from './FormatoNoSoportado';

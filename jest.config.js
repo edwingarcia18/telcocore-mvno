@@ -12,7 +12,7 @@ module.exports = {
       },
     }],
   },
-  collectCoverageFrom: ['src/domain/**/*.ts', 'src/application/**/*.ts'],
+  collectCoverageFrom: ['src/domain/**/*.ts', 'src/application/**/*.ts', 'src/infrastructure/parsers/**/*.ts'],
   // Se exige al ejecutar `npm run test:cov` (criterio de la rúbrica: >= 80 %)
   coverageThreshold: { global: { statements: 80, branches: 80, functions: 80, lines: 80 } },
 };
