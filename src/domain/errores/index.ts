@@ -3,3 +3,5 @@ export * from './CDRInvalido';
 export * from './PlanNoExiste';
 export * from './TarifaNoAplicable';
 export * from './LoteCorrupto';
+export * from './ParametrosInvalidos';
+export * from './TipoEstrategiaDesconocido';

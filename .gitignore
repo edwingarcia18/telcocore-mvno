@@ -3,3 +3,4 @@ dist
 web/dist
 coverage
 .env
+test/tmp-roaming
