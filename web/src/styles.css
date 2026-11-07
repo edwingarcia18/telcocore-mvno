@@ -1,0 +1,13 @@
+:root { --lima: #C7D309; --oliva: #5E6B00; --gris: #808286; --tinta: #2E3033; --suave: #5F6368; --fondo: #F3F4F4; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fondo); color: var(--tinta); font-family: Inter, system-ui, sans-serif; }
+.cabecera { background: #fff; padding: 18px 20px 10px; border-bottom: 4px solid var(--lima); }
+.contenido { max-width: 480px; margin: 0 auto; padding: 16px 20px; }
+h1 { font-size: 22px; margin: 0 0 12px; }
+.tarjeta { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 2px rgba(18, 32, 43, .08); }
+.estado { display: flex; align-items: center; gap: 8px; margin: 0; font-weight: 600; }
+.estado.ok { color: var(--oliva); }
+.estado.error { color: #7F1D1D; }
+.detalle { margin: 8px 0 0; font-size: 13px; color: var(--suave); }
+.girar { animation: giro 1s linear infinite; }
+@keyframes giro { to { transform: rotate(360deg); } }

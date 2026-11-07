@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: telcocore-db
+    environment:
+      POSTGRES_USER: telcocore
+      POSTGRES_PASSWORD: telcocore
+      POSTGRES_DB: telcocore
+    ports:
+      - "5432:5432"
+    volumes:
+      - telcocore-data:/var/lib/postgresql/data
+volumes:
+  telcocore-data:

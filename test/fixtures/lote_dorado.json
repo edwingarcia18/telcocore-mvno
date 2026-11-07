@@ -1,0 +1,100 @@
+[
+  {
+    "id_externo": "C001",
+    "tipo": "VOZ",
+    "msisdn": "3001000001",
+    "timestamp_utc": "2026-10-03T14:05:00Z",
+    "duracion_seg": 150
+  },
+  {
+    "id_externo": "C002",
+    "tipo": "SMS",
+    "msisdn": "3001000001",
+    "timestamp_utc": "2026-10-03T15:00:00Z",
+    "cantidad": 3
+  },
+  {
+    "id_externo": "C003",
+    "tipo": "DATOS",
+    "msisdn": "3001000001",
+    "timestamp_utc": "2026-10-03T16:00:00Z",
+    "bytes": 52428800
+  },
+  {
+    "id_externo": "C004",
+    "tipo": "VOZ",
+    "msisdn": "3002000002",
+    "timestamp_utc": "2026-10-05T09:00:00Z",
+    "duracion_seg": 17900
+  },
+  {
+    "id_externo": "C005",
+    "tipo": "VOZ",
+    "msisdn": "3002000002",
+    "timestamp_utc": "2026-10-05T10:00:00Z",
+    "duracion_seg": 300
+  },
+  {
+    "id_externo": "C006",
+    "tipo": "SMS",
+    "msisdn": "3002000002",
+    "timestamp_utc": "2026-10-06T10:00:00Z",
+    "cantidad": 120
+  },
+  {
+    "id_externo": "C007",
+    "tipo": "DATOS",
+    "msisdn": "3003000003",
+    "timestamp_utc": "2026-10-07T08:00:00Z",
+    "bytes": 1073741824
+  },
+  {
+    "id_externo": "C008",
+    "tipo": "DATOS",
+    "msisdn": "3003000003",
+    "timestamp_utc": "2026-10-08T08:00:00Z",
+    "bytes": 2147483648
+  },
+  {
+    "id_externo": "C009",
+    "tipo": "DATOS",
+    "msisdn": "3003000003",
+    "timestamp_utc": "2026-10-09T08:00:00Z",
+    "bytes": 4294967296
+  },
+  {
+    "id_externo": "C010",
+    "tipo": "VOZ",
+    "msisdn": "3003000003",
+    "timestamp_utc": "2026-10-09T09:00:00Z",
+    "duracion_seg": 60
+  },
+  {
+    "id_externo": "C011",
+    "tipo": "VOZ",
+    "msisdn": "3009999999",
+    "timestamp_utc": "2026-10-09T10:00:00Z",
+    "duracion_seg": 60
+  },
+  {
+    "id_externo": "C012",
+    "tipo": "VOZ",
+    "msisdn": "3001000001",
+    "timestamp_utc": "2026-10-09T11:00:00Z",
+    "duracion_seg": -5
+  },
+  {
+    "id_externo": "C013",
+    "tipo": "FAX",
+    "msisdn": "3001000001",
+    "timestamp_utc": "2026-10-09T12:00:00Z",
+    "duracion_seg": 10
+  },
+  {
+    "id_externo": "C001",
+    "tipo": "VOZ",
+    "msisdn": "3001000001",
+    "timestamp_utc": "2026-10-03T14:05:00Z",
+    "duracion_seg": 150
+  }
+]
