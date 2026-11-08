@@ -4,3 +4,4 @@ web/dist
 coverage
 .env
 test/tmp-roaming
+src/infrastructure/prisma/generated

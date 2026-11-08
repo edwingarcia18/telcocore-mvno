@@ -1,0 +1,125 @@
+// TelcoCore MVNO - esquema de datos (PostgreSQL)
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/infrastructure/prisma/generated"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TipoServicio {
+  VOZ
+  SMS
+  DATOS
+}
+
+enum EstadoLote {
+  PROCESADO
+  PROCESADO_CON_RECHAZOS
+  FALLIDO
+}
+
+enum CausaRechazo {
+  CDR_INVALIDO
+  PLAN_NO_EXISTE
+  TARIFA_NO_APLICABLE
+}
+
+model Plan {
+  id             Int          @id @default(autoincrement())
+  nombre         String       @unique
+  tipoEstrategia String
+  parametros     Json
+  activo         Boolean      @default(true)
+  suscriptores   Suscriptor[]
+}
+
+model Suscriptor {
+  id       Int                @id @default(autoincrement())
+  msisdn   String             @unique
+  nombre   String
+  planId   Int
+  plan     Plan               @relation(fields: [planId], references: [id])
+  cdrs     Cdr[]
+  consumos ConsumoAcumulado[]
+  facturas FacturaMensual[]
+}
+
+model Lote {
+  id            Int        @id @default(autoincrement())
+  hashSha256    String     @unique
+  nombreArchivo String
+  formato       String
+  estado        EstadoLote
+  total         Int
+  aceptados     Int
+  rechazados    Int
+  creadoEn      DateTime   @default(now())
+  cdrs          Cdr[]
+  rechazos      Rechazo[]
+}
+
+model Cdr {
+  id           BigInt         @id @default(autoincrement())
+  idExterno    String         @unique
+  tipo         TipoServicio
+  suscriptorId Int
+  suscriptor   Suscriptor     @relation(fields: [suscriptorId], references: [id])
+  loteId       Int
+  lote         Lote           @relation(fields: [loteId], references: [id])
+  inicio       DateTime
+  periodo      String
+  duracionSeg  Int?
+  cantidadSms  Int?
+  bytes        BigInt?
+  lineas       LineaFactura[]
+
+  @@index([suscriptorId, periodo, tipo])
+}
+
+model LineaFactura {
+  id       BigInt  @id @default(autoincrement())
+  cdrId    BigInt
+  cdr      Cdr     @relation(fields: [cdrId], references: [id])
+  concepto String
+  cantidad Decimal @db.Decimal(38, 20)
+  unidad   String
+  monto    Decimal @db.Decimal(14, 0)
+}
+
+model ConsumoAcumulado {
+  suscriptorId Int
+  periodo      String
+  servicio     TipoServicio
+  cantidad     Decimal      @db.Decimal(38, 20)
+  suscriptor   Suscriptor   @relation(fields: [suscriptorId], references: [id])
+
+  @@id([suscriptorId, periodo, servicio])
+}
+
+model FacturaMensual {
+  id            Int        @id @default(autoincrement())
+  suscriptorId  Int
+  periodo       String
+  cuotaFija     Decimal    @db.Decimal(14, 0)
+  totalVariable Decimal    @db.Decimal(14, 0)
+  total         Decimal    @db.Decimal(14, 0)
+  generadaEn    DateTime   @default(now())
+  suscriptor    Suscriptor @relation(fields: [suscriptorId], references: [id])
+
+  @@unique([suscriptorId, periodo])
+}
+
+model Rechazo {
+  id         Int          @id @default(autoincrement())
+  loteId     Int
+  lote       Lote         @relation(fields: [loteId], references: [id])
+  numeroFila Int
+  idExterno  String?
+  causa      CausaRechazo
+  detalle    String
+  crudo      String
+  creadoEn   DateTime     @default(now())
+}

@@ -1,7 +1,7 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 export default [
-  { ignores: ['*.config.js', 'dist/**', 'web/dist/**', 'node_modules/**', 'coverage/**'] },
+  { ignores: ['*.config.js', 'src/infrastructure/prisma/generated/**', 'dist/**', 'web/dist/**', 'node_modules/**', 'coverage/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

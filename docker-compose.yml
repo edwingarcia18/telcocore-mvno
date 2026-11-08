@@ -7,7 +7,8 @@ services:
       POSTGRES_PASSWORD: telcocore
       POSTGRES_DB: telcocore
     ports:
-      - "5432:5432"
+      # Puerto del computador: 5432 por defecto; se cambia con DB_PORT en el archivo .env
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - telcocore-data:/var/lib/postgresql/data
 volumes:
