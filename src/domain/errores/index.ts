@@ -7,3 +7,4 @@ export * from './ParametrosInvalidos';
 export * from './TipoEstrategiaDesconocido';
 export * from './FormatoNoSoportado';
 export * from './PlanDuplicado';
+export * from './LoteDuplicado';
