@@ -6,4 +6,6 @@ export interface LoteRepository {
   actualizarResultado(id: number, resultado: ResultadoLote): Promise<Lote>;
   buscarPorId(id: number): Promise<Lote | null>;
   buscarPorHash(hashSha256: string): Promise<Lote | null>;
+  /** Los lotes más recientes primero. */
+  listar(limite: number): Promise<Lote[]>;
 }

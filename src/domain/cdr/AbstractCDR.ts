@@ -1,9 +1,8 @@
 import { CDRInvalido } from '../errores';
-import { Dec, TipoServicio } from '../modelo';
+import { Dec, TipoServicio, periodoDe } from '../modelo';
 import { exigirTexto } from './validaciones';
 
 const MSISDN = /^\d{10}$/;
-const formatoPeriodo = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit' });
 
 /**
  * Registro de detalle de llamada (CDR). Clase ABSTRACTA: concentra los datos y reglas comunes
@@ -32,9 +31,7 @@ export abstract class AbstractCDR {
 
   /** Mes calendario de facturación 'YYYY-MM' en la zona America/Bogota. */
   get periodo(): string {
-    const partes = formatoPeriodo.formatToParts(this.inicio);
-    const valor = (tipo: string) => partes.find((p) => p.type === tipo)?.value ?? '';
-    return `${valor('year')}-${valor('month')}`;
+    return periodoDe(this.inicio);
   }
 
   abstract get tipoServicio(): TipoServicio;

@@ -8,3 +8,6 @@ export * from './TipoEstrategiaDesconocido';
 export * from './FormatoNoSoportado';
 export * from './PlanDuplicado';
 export * from './LoteDuplicado';
+export * from './SuscriptorNoExiste';
+export * from './LoteNoEncontrado';
+export * from './PeriodoInvalido';

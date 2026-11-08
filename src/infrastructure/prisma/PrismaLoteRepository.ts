@@ -20,4 +20,8 @@ export class PrismaLoteRepository implements LoteRepository {
   buscarPorHash(hashSha256: string): Promise<Lote | null> {
     return this.db.lote.findUnique({ where: { hashSha256 } });
   }
+
+  listar(limite: number): Promise<Lote[]> {
+    return this.db.lote.findMany({ orderBy: { id: 'desc' }, take: limite });
+  }
 }

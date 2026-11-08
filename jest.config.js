@@ -23,7 +23,7 @@ module.exports = {
       globalSetup: '<rootDir>/test/integration/globalSetup.ts', testTimeout: 30000,
     },
   ],
-  collectCoverageFrom: ['src/domain/**/*.ts', 'src/application/**/*.ts', 'src/infrastructure/**/*.ts', '!src/infrastructure/prisma/generated/**'],
+  collectCoverageFrom: ['src/domain/**/*.ts', 'src/application/**/*.ts', 'src/infrastructure/**/*.ts', 'src/http/**/*.ts', 'src/app.ts', 'src/composicion.ts', '!src/infrastructure/prisma/generated/**'],
   // Se exige al ejecutar `npm run test:cov` (criterio de la rúbrica: >= 80 %)
   coverageThreshold: { global: { statements: 80, branches: 80, functions: 80, lines: 80 } },
 };

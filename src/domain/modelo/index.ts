@@ -3,3 +3,4 @@ export * from './TipoServicio';
 export * from './ContextoConsumo';
 export * from './LineaTarifada';
 export * from './entidades';
+export * from './periodo';
