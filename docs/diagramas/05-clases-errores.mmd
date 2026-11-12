@@ -1,0 +1,79 @@
+---
+title: "Jerarquía de errores del dominio y su estado HTTP"
+---
+classDiagram
+  direction TB
+  classDef dominio fill:#F7FAD5,stroke:#8A9400,color:#1E2A00
+  classDef aplicacion fill:#EEF1D9,stroke:#5E6B00,color:#1E2A00
+  classDef infra fill:#F1F2F3,stroke:#808286,color:#2E3033
+  classDef http fill:#E8E9EA,stroke:#2E3033,color:#2E3033
+  classDef externo fill:#FFFFFF,stroke:#808286,color:#2E3033,stroke-dasharray:4
+  class ErrorDominio:::dominio {
+    <<abstract>>
+    +codigo* string
+    +detalle string
+    +message string
+  }
+  class CDRInvalido:::dominio {
+    +codigo CDR_INVALIDO  (HTTP 422)
+    +causa
+  }
+  class PlanNoExiste:::dominio {
+    +codigo PLAN_NO_EXISTE  (HTTP 404)
+    +msisdn
+  }
+  class TarifaNoAplicable:::dominio {
+    +codigo TARIFA_NO_APLICABLE  (HTTP 422)
+    +plan, +servicio
+  }
+  class SuscriptorNoExiste:::dominio {
+    +codigo SUSCRIPTOR_NO_EXISTE  (HTTP 404)
+    +msisdn
+  }
+  class LoteNoEncontrado:::dominio {
+    +codigo LOTE_NO_ENCONTRADO  (HTTP 404)
+    +loteId
+  }
+  class LoteDuplicado:::dominio {
+    +codigo LOTE_DUPLICADO  (HTTP 409)
+    +loteId
+  }
+  class PlanDuplicado:::dominio {
+    +codigo PLAN_DUPLICADO  (HTTP 409)
+    +nombre
+  }
+  class PlanNoEncontrado:::dominio {
+    +codigo PLAN_NO_ENCONTRADO  (HTTP 404)
+    +nombre
+  }
+  class LoteCorrupto:::dominio {
+    +codigo LOTE_CORRUPTO  (HTTP 422)
+    +motivo
+  }
+  class ParametrosInvalidos:::dominio {
+    +codigo PARAMETROS_INVALIDOS  (HTTP 422)
+  }
+  class TipoEstrategiaDesconocido:::dominio {
+    +codigo TIPO_ESTRATEGIA_DESCONOCIDO  (HTTP 422)
+    +tipo
+  }
+  class FormatoNoSoportado:::dominio {
+    +codigo FORMATO_NO_SOPORTADO  (HTTP 400)
+    +formato
+  }
+  class PeriodoInvalido:::dominio {
+    +codigo PERIODO_INVALIDO  (HTTP 400)
+  }
+  ErrorDominio <|-- CDRInvalido
+  ErrorDominio <|-- PlanNoExiste
+  ErrorDominio <|-- TarifaNoAplicable
+  ErrorDominio <|-- SuscriptorNoExiste
+  ErrorDominio <|-- LoteNoEncontrado
+  ErrorDominio <|-- LoteDuplicado
+  ErrorDominio <|-- PlanDuplicado
+  ErrorDominio <|-- PlanNoEncontrado
+  ErrorDominio <|-- LoteCorrupto
+  ErrorDominio <|-- ParametrosInvalidos
+  ErrorDominio <|-- TipoEstrategiaDesconocido
+  ErrorDominio <|-- FormatoNoSoportado
+  ErrorDominio <|-- PeriodoInvalido

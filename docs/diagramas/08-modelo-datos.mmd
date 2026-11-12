@@ -1,0 +1,80 @@
+---
+title: "Modelo de datos (PostgreSQL)"
+---
+erDiagram
+  Plan ||--o{ Suscriptor : "tiene"
+  Suscriptor ||--o{ Cdr : "genera"
+  Lote ||--o{ Cdr : "contiene"
+  Lote ||--o{ Rechazo : "registra"
+  Cdr ||--o{ LineaFactura : "se tarifica en"
+  Suscriptor ||--o{ ConsumoAcumulado : "acumula"
+  Suscriptor ||--o{ FacturaMensual : "recibe"
+  Plan {
+    int id PK
+    string nombre UK
+    string tipoEstrategia
+    json parametros
+    boolean activo
+  }
+  Suscriptor {
+    int id PK
+    string msisdn UK
+    string nombre
+    int planId FK
+  }
+  Lote {
+    int id PK
+    string hashSha256 UK
+    string nombreArchivo
+    string formato
+    enum estado
+    int total
+    int aceptados
+    int rechazados
+    datetime creadoEn
+  }
+  Cdr {
+    bigint id PK
+    string idExterno UK
+    enum tipo
+    int suscriptorId FK
+    int loteId FK
+    datetime inicio
+    string periodo
+    int duracionSeg
+    int cantidadSms
+    bigint bytes
+  }
+  LineaFactura {
+    bigint id PK
+    bigint cdrId FK
+    string concepto
+    decimal cantidad
+    string unidad
+    decimal monto
+  }
+  ConsumoAcumulado {
+    int suscriptorId PK,FK
+    string periodo PK
+    enum servicio PK
+    decimal cantidad
+  }
+  FacturaMensual {
+    int id PK
+    int suscriptorId FK
+    string periodo
+    decimal cuotaFija
+    decimal totalVariable
+    decimal total
+    datetime generadaEn
+  }
+  Rechazo {
+    int id PK
+    int loteId FK
+    int numeroFila
+    string idExterno
+    enum causa
+    string detalle
+    string crudo
+    datetime creadoEn
+  }

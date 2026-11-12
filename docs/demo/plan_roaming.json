@@ -1,0 +1,5 @@
+{
+  "nombre": "Plan-Roaming",
+  "tipoEstrategia": "ROAMING",
+  "parametros": { "vozPorSegundo": 6, "smsPorMensaje": 200 }
+}

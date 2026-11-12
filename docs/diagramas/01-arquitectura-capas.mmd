@@ -1,0 +1,53 @@
+---
+title: "Arquitectura por capas"
+---
+flowchart TB
+  subgraph ext["Externos"]
+    direction LR
+    ext0["Cliente<br/>Postman · panel web (Vite + React) · curl"]
+    ext1["Archivos de CDR<br/>CSV o JSON"]
+  end
+  subgraph http["Capa HTTP   ·   src/http  y  src/app.ts"]
+    direction LR
+    http0["Rutas Express<br/>+ multer (subida)"]
+    http1["Validación (zod)<br/>+ DTO"]
+    http2["Manejador de errores<br/>dominio → HTTP"]
+    http3["OpenAPI + Swagger UI<br/>/api/docs"]
+  end
+  subgraph app["Capa de aplicación   ·   src/application"]
+    direction LR
+    app0["ServicioIngestaLotes"]
+    app1["MotorRating"]
+    app2["ServicioFacturacion"]
+    app3["ServicioSuscriptores<br/>+ sembrarCatalogo"]
+  end
+  subgraph dom["Dominio   ·   src/domain   (TypeScript puro: no importa Prisma ni Express)"]
+    direction LR
+    dom0["Jerarquía de CDR<br/>AbstractCDR, Voice, SMS, Data"]
+    dom1["Estrategias de tarificación<br/>+ RegistroEstrategias"]
+    dom2["Modelo<br/>Dec, período, entidades"]
+    dom3["Errores del dominio"]
+    dom4["Contratos de repositorio<br/>+ UnidadDeTrabajo"]
+  end
+  subgraph inf["Infraestructura   ·   src/infrastructure"]
+    direction LR
+    inf0["Lectores CSV / JSON<br/>+ FabricaCDR"]
+    inf1["Repositorios Prisma<br/>+ PrismaUnidadDeTrabajo"]
+    inf2["Cliente Prisma<br/>(adaptador pg)"]
+  end
+  subgraph bd["Base de datos"]
+    direction LR
+    bd0["PostgreSQL 16<br/>contenedor Docker · migraciones Prisma"]
+  end
+  ext -->|"HTTP / JSON · multipart"| http
+  http -->|"invoca los casos de uso"| app
+  app -->|"usa entidades, estrategias y contratos"| dom
+  inf -->|"implementa los contratos del dominio"| dom
+  inf -->|"SQL"| bd
+  app -.->|"lee el archivo con los lectores (acoplamiento directo aceptado)"| inf
+  style ext fill:#FFFFFF,stroke:#808286,color:#2E3033,stroke-dasharray:4
+  style http fill:#E8E9EA,stroke:#2E3033,color:#2E3033
+  style app fill:#EEF1D9,stroke:#5E6B00,color:#1E2A00
+  style dom fill:#F7FAD5,stroke:#8A9400,color:#1E2A00
+  style inf fill:#F1F2F3,stroke:#808286,color:#2E3033
+  style bd fill:#FFFFFF,stroke:#808286,color:#2E3033,stroke-dasharray:4

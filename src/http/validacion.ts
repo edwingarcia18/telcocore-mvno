@@ -24,3 +24,9 @@ export function validar<T extends z.ZodType>(esquema: T, datos: unknown): z.outp
   if (r.success) return r.data;
   throw new SolicitudInvalida('La solicitud tiene campos inválidos', r.error.issues.map((i) => `${i.path.join('.') || 'cuerpo'}: ${i.message}`));
 }
+
+export const parametrosSuscriptor = z.object({ msisdn: z.string().regex(/^\d{10}$/, 'debe tener 10 dígitos') });
+export const cuerpoSuscriptor = z.object({
+  nombre: z.string().trim().min(1, 'es obligatorio').max(80, 'máximo 80 caracteres'),
+  plan: z.string().trim().min(1, 'es obligatorio'),
+});

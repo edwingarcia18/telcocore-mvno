@@ -21,6 +21,7 @@ class SuscriptoresEnMemoria implements SuscriptorRepository {
   readonly datos = new Map<string, NuevoSuscriptor>();
   async upsertPorMsisdn(s: NuevoSuscriptor): Promise<Suscriptor> { this.datos.set(s.msisdn, s); return { id: this.datos.size, msisdn: s.msisdn, nombre: s.nombre, plan: {} as Plan }; }
   async buscarPorMsisdn() { return null; }
+  async listar() { return []; }
 }
 
 describe('sembrarCatalogo (con repositorios en memoria)', () => {

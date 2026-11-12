@@ -1,0 +1,33 @@
+---
+title: "Secuencia: consultar una factura (GET /api/facturas)"
+---
+sequenceDiagram
+  autonumber
+  participant cli as Cliente<br/>(Postman o panel)
+  participant api as Rutas HTTP<br/>(Express + zod)
+  participant svc as ServicioFacturacion
+  participant reg as RegistroEstrategias
+  participant bd as Repositorios Prisma<br/>+ PostgreSQL
+    cli->>api: GET /api/facturas?suscriptor=…&mes=2026-10
+    api->>api: valida los parámetros (zod)
+    opt parámetros inválidos
+      api-->>cli: 400 SOLICITUD_INVALIDA
+    end
+    api->>svc: generar(msisdn, periodo)
+    svc->>svc: valida el período: YYYY-MM y no futuro
+    opt período inválido
+      svc-->>cli: 400 PERIODO_INVALIDO
+    end
+    svc->>bd: BEGIN · buscarPorMsisdn(msisdn)
+    opt el suscriptor no existe
+      svc-->>cli: 404 SUSCRIPTOR_NO_EXISTE
+    end
+    svc->>reg: crear(tipoEstrategia, parametros, plan)
+    reg-->>svc: estrategia (con su cuota fija)
+    svc->>bd: lineasDelPeriodo(suscriptorId, periodo)
+    bd-->>svc: líneas tarificadas, en orden cronológico
+    svc->>svc: total = cuota fija + suma de montos
+    svc->>svc: agruparLineas(): une concepto y unidad
+    svc->>bd: guardar factura (upsert) + COMMIT
+    svc-->>api: FacturaDetallada
+    api-->>cli: 200 · cuotaFija, totalVariable, total, líneas

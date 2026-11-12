@@ -1,0 +1,108 @@
+---
+title: "Persistencia: patrones Repository y Unidad de Trabajo"
+---
+classDiagram
+  direction TB
+  classDef dominio fill:#F7FAD5,stroke:#8A9400,color:#1E2A00
+  classDef aplicacion fill:#EEF1D9,stroke:#5E6B00,color:#1E2A00
+  classDef infra fill:#F1F2F3,stroke:#808286,color:#2E3033
+  classDef http fill:#E8E9EA,stroke:#2E3033,color:#2E3033
+  classDef externo fill:#FFFFFF,stroke:#808286,color:#2E3033,stroke-dasharray:4
+  class UnidadDeTrabajo:::dominio {
+    <<interface>>
+    +repos Repositorios
+    +ejecutar(trabajo, opciones) T
+  }
+  class PrismaUnidadDeTrabajo:::infra {
+    -prisma PrismaClient
+    +ejecutar(trabajo, opciones) T
+  }
+  class Repositorios:::dominio {
+    <<interface>>
+    +planes PlanRepository
+    +suscriptores SuscriptorRepository
+    +lotes LoteRepository
+    +cdrs CDRRepository
+    +consumos ConsumoRepository
+    +rechazos RechazoRepository
+    +facturas FacturaRepository
+  }
+  class PlanRepository:::dominio {
+    <<interface>>
+    crear(plan)
+    upsertPorNombre(plan)
+    buscarPorNombre(nombre)
+    listar()
+  }
+  class PrismaPlanRepository:::infra {
+    -db Db
+  }
+  class SuscriptorRepository:::dominio {
+    <<interface>>
+    upsertPorMsisdn(s)
+    buscarPorMsisdn(msisdn)
+    listar()
+  }
+  class PrismaSuscriptorRepository:::infra {
+    -db Db
+  }
+  class LoteRepository:::dominio {
+    <<interface>>
+    crear(lote)
+    actualizarResultado(id, r)
+    buscarPorHash(hash)
+    listar(limite)
+  }
+  class PrismaLoteRepository:::infra {
+    -db Db
+  }
+  class CDRRepository:::dominio {
+    <<interface>>
+    idsExistentes(ids)
+    guardarVarios(loteId, items)
+    listarPorSuscriptorYPeriodo(...)
+  }
+  class PrismaCDRRepository:::infra {
+    -db Db
+  }
+  class ConsumoRepository:::dominio {
+    <<interface>>
+    obtener(suscriptorId, periodo)
+    guardar(suscriptorId, consumo)
+  }
+  class PrismaConsumoRepository:::infra {
+    -db Db
+  }
+  class RechazoRepository:::dominio {
+    <<interface>>
+    guardarVarios(loteId, rechazos)
+    listarPorLote(loteId, pagina, tamano)
+  }
+  class PrismaRechazoRepository:::infra {
+    -db Db
+  }
+  class FacturaRepository:::dominio {
+    <<interface>>
+    lineasDelPeriodo(suscriptorId, periodo)
+    guardar(factura)
+    buscar(suscriptorId, periodo)
+  }
+  class PrismaFacturaRepository:::infra {
+    -db Db
+  }
+  UnidadDeTrabajo --> Repositorios : repos
+  UnidadDeTrabajo <|.. PrismaUnidadDeTrabajo
+  PlanRepository <|.. PrismaPlanRepository
+  Repositorios o-- PlanRepository
+  SuscriptorRepository <|.. PrismaSuscriptorRepository
+  Repositorios o-- SuscriptorRepository
+  LoteRepository <|.. PrismaLoteRepository
+  Repositorios o-- LoteRepository
+  CDRRepository <|.. PrismaCDRRepository
+  Repositorios o-- CDRRepository
+  ConsumoRepository <|.. PrismaConsumoRepository
+  Repositorios o-- ConsumoRepository
+  RechazoRepository <|.. PrismaRechazoRepository
+  Repositorios o-- RechazoRepository
+  FacturaRepository <|.. PrismaFacturaRepository
+  Repositorios o-- FacturaRepository

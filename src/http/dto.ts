@@ -1,5 +1,5 @@
 import { FacturaDetallada } from '../application';
-import { Lote, Plan, Rechazo } from '../domain/modelo';
+import { Lote, Plan, Rechazo, Suscriptor } from '../domain/modelo';
 
 /** Representación JSON de las entidades. Los decimales viajan como texto para no perder precisión. */
 export const facturaDto = (f: FacturaDetallada) => ({
@@ -26,3 +26,5 @@ export const loteDto = (l: Lote) => ({
 });
 
 export const rechazoDto = (r: Rechazo) => ({ numeroFila: r.numeroFila, idExterno: r.idExterno, causa: r.causa, detalle: r.detalle, crudo: r.crudo });
+
+export const suscriptorDto = (s: Suscriptor) => ({ msisdn: s.msisdn, nombre: s.nombre, plan: s.plan.nombre });

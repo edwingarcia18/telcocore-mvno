@@ -11,3 +11,4 @@ export * from './LoteDuplicado';
 export * from './SuscriptorNoExiste';
 export * from './LoteNoEncontrado';
 export * from './PeriodoInvalido';
+export * from './PlanNoEncontrado';

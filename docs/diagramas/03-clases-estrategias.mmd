@@ -1,0 +1,79 @@
+---
+title: "Estrategias de tarificación y motor de rating"
+---
+classDiagram
+  direction TB
+  classDef dominio fill:#F7FAD5,stroke:#8A9400,color:#1E2A00
+  classDef aplicacion fill:#EEF1D9,stroke:#5E6B00,color:#1E2A00
+  classDef infra fill:#F1F2F3,stroke:#808286,color:#2E3033
+  classDef http fill:#E8E9EA,stroke:#2E3033,color:#2E3033
+  classDef externo fill:#FFFFFF,stroke:#808286,color:#2E3033,stroke-dasharray:4
+  class EstrategiaTarificacion:::dominio {
+    <<interface>>
+    +nombrePlan string
+    +cuotaFija Dec
+    +tarificar(cdr, ctx) List~LineaTarifada~
+  }
+  class PrepagoClasicoStrategy:::dominio {
+    -vozPorSegundo Dec
+    -smsPorMensaje Dec
+  }
+  class PostpagoMixStrategy:::dominio {
+    -cuotaFija Dec
+    -incluidos y excedentes Dec
+  }
+  class DatosFlexStrategy:::dominio {
+    -tramos List~Tramo~
+  }
+  class RoamingStrategy:::dominio {
+    -vozPorSegundo Dec
+    -smsPorMensaje Dec
+  }
+  class RegistroEstrategias:::dominio {
+    -fabricas Map
+    +registrar(definicion)
+    +crear(tipo, parametros, nombrePlan) EstrategiaTarificacion
+    +tiene(tipo) boolean
+    +tiposRegistrados() List~string~
+  }
+  class DefinicionEstrategia:::dominio {
+    <<interface>>
+    +tipo string
+    +crear fábrica
+  }
+  class descubrirEstrategias:::dominio {
+    <<función>>
+    +descubrirEstrategias(registro, carpeta) List~string~
+  }
+  class ContextoConsumo:::dominio {
+    <<interface>>
+    +periodo string
+    +acumulado(servicio) Dec
+  }
+  class AcumuladorConsumo:::dominio {
+    -totales Map
+    +acumulado(servicio) Dec
+    +acumular(servicio, cantidad)
+  }
+  class MotorRating:::aplicacion {
+    +tarificar(cdr, estrategia, consumo) List~LineaTarifada~
+  }
+  class LineaTarifada:::dominio {
+    <<tipo>>
+    +concepto string
+    +cantidad Dec
+    +unidad SEG | SMS | MB
+    +monto Dec
+  }
+  EstrategiaTarificacion <|.. PrepagoClasicoStrategy
+  EstrategiaTarificacion <|.. PostpagoMixStrategy
+  EstrategiaTarificacion <|.. DatosFlexStrategy
+  EstrategiaTarificacion <|.. RoamingStrategy
+  EstrategiaTarificacion ..> ContextoConsumo : lee
+  EstrategiaTarificacion ..> LineaTarifada : devuelve
+  ContextoConsumo <|.. AcumuladorConsumo
+  RegistroEstrategias o-- DefinicionEstrategia : guarda
+  DefinicionEstrategia ..> EstrategiaTarificacion : crea
+  descubrirEstrategias ..> RegistroEstrategias : registra
+  MotorRating ..> EstrategiaTarificacion : usa
+  MotorRating ..> AcumuladorConsumo : actualiza

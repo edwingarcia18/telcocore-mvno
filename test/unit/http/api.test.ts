@@ -3,7 +3,7 @@ import { crearApp } from '../../../src/app';
 import { FacturaDetallada } from '../../../src/application';
 import {
   CDRInvalido, ErrorDominio, FormatoNoSoportado, LoteCorrupto, LoteDuplicado, LoteNoEncontrado, ParametrosInvalidos,
-  PeriodoInvalido, PlanDuplicado, PlanNoExiste, SuscriptorNoExiste, TarifaNoAplicable, TipoEstrategiaDesconocido,
+  PeriodoInvalido, PlanDuplicado, PlanNoEncontrado, PlanNoExiste, SuscriptorNoExiste, TarifaNoAplicable, TipoEstrategiaDesconocido,
 } from '../../../src/domain/errores';
 import { crearRegistroPorDefecto } from '../../../src/domain/estrategias';
 import { Dec } from '../../../src/domain/modelo';
@@ -13,9 +13,12 @@ import { ESTADO_POR_CODIGO } from '../../../src/http/errores';
 
 const ingestar = jest.fn();
 const generar = jest.fn();
+const listar = jest.fn();
+const asignar = jest.fn();
 const deps: Dependencias = {
   ingesta: { ingestar },
   facturacion: { generar },
+  suscriptores: { listar, asignar },
   uow: {} as UnidadDeTrabajo, // estas pruebas fallan o terminan antes de llegar a la base de datos
   registro: crearRegistroPorDefecto(),
 };
@@ -30,6 +33,7 @@ const ERRORES: [string, ErrorDominio, number][] = [
   ['CDRInvalido', new CDRInvalido('VALOR_INVALIDO', 'x'), 422],
   ['TarifaNoAplicable', new TarifaNoAplicable('Datos-Flex', 'VOZ'), 422],
   ['PlanDuplicado', new PlanDuplicado('X'), 409],
+  ['PlanNoEncontrado', new PlanNoEncontrado('X'), 404],
   ['SuscriptorNoExiste', new SuscriptorNoExiste('3009999999'), 404],
   ['LoteNoEncontrado', new LoteNoEncontrado(99), 404],
   ['PeriodoInvalido', new PeriodoInvalido('x'), 400],
@@ -149,5 +153,31 @@ describe('GET /api/facturas y /api/rechazos: validación de parámetros', () => 
     expect((await request(app).get('/api/rechazos').query({ lote: 'abc' })).status).toBe(400);
     expect((await request(app).get('/api/rechazos').query({ lote: 1, size: 500 })).status).toBe(400);
     expect((await request(app).get('/api/rechazos')).status).toBe(400);
+  });
+});
+
+describe('Suscriptores', () => {
+  const plan = { id: 1, nombre: 'Prepago-Clásico', tipoEstrategia: 'PREPAGO_CLASICO', parametros: {}, activo: true };
+
+  it('GET /api/suscriptores devuelve número, nombre y nombre del plan', async () => {
+    listar.mockResolvedValue([{ id: 1, msisdn: '3001000001', nombre: 'Ana', plan }]);
+    const r = await request(app).get('/api/suscriptores');
+    expect(r.body).toEqual([{ msisdn: '3001000001', nombre: 'Ana', plan: 'Prepago-Clásico' }]);
+  });
+  it('PUT guarda al suscriptor con el plan indicado por nombre', async () => {
+    asignar.mockResolvedValue({ id: 1, msisdn: '3001000001', nombre: 'Nuevo', plan });
+    const r = await request(app).put('/api/suscriptores/3001000001').send({ nombre: 'Nuevo', plan: 'Prepago-Clásico' });
+    expect([r.status, r.body]).toEqual([200, { msisdn: '3001000001', nombre: 'Nuevo', plan: 'Prepago-Clásico' }]);
+    expect(asignar).toHaveBeenCalledWith('3001000001', 'Nuevo', 'Prepago-Clásico');
+  });
+  it('PUT con número o cuerpo inválidos => 400 sin llamar al servicio', async () => {
+    expect((await request(app).put('/api/suscriptores/123').send({ nombre: 'X', plan: 'P' })).status).toBe(400);
+    expect((await request(app).put('/api/suscriptores/3001000001').send({})).status).toBe(400);
+    expect(asignar).not.toHaveBeenCalled();
+  });
+  it('un plan inexistente => 404 PLAN_NO_ENCONTRADO', async () => {
+    asignar.mockRejectedValue(new PlanNoEncontrado('Fantasma'));
+    const r = await request(app).put('/api/suscriptores/3001000001').send({ nombre: 'X', plan: 'Fantasma' });
+    expect([r.status, r.body.error.codigo]).toEqual([404, 'PLAN_NO_ENCONTRADO']);
   });
 });

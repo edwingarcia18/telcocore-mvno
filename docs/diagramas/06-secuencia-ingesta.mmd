@@ -1,0 +1,48 @@
+---
+title: "Secuencia: procesar un lote de CDR (POST /api/lotes/cdr)"
+---
+sequenceDiagram
+  autonumber
+  participant cli as Cliente<br/>(Postman o panel)
+  participant api as Rutas HTTP<br/>(Express + multer)
+  participant svc as ServicioIngestaLotes
+  participant lec as ParserLote<br/>+ FabricaCDR
+  participant mot as MotorRating
+  participant est as EstrategiaTarificacion<br/>(la del plan)
+  participant bd as Repositorios Prisma<br/>+ PostgreSQL
+    cli->>api: POST /api/lotes/cdr (archivo.csv)
+    api->>svc: ingestar(archivo)
+    svc->>lec: crearParser(nombre) y parsear(contenido)
+    alt archivo ilegible o con más de 10.000 filas
+      lec-->>svc: LoteCorrupto
+      svc->>bd: registrar lote FALLIDO
+      svc-->>cli: 422 LOTE_CORRUPTO
+    else archivo legible
+      lec-->>svc: filas: CDR válidos o error por fila
+    end
+    svc->>bd: BEGIN transacción exclusiva
+    svc->>bd: buscarPorHash(SHA-256 del archivo)
+    opt el archivo ya fue procesado
+      svc-->>cli: 409 LOTE_DUPLICADO (ROLLBACK)
+    end
+    svc->>bd: crear lote · idsExistentes(ids)
+    loop por cada CDR válido, en orden cronológico
+      svc->>bd: suscriptor, plan y consumo acumulado
+      svc->>mot: tarificar(cdr, estrategia, consumo)
+      mot->>est: tarificar(cdr, contexto)
+      est-->>mot: líneas tarificadas
+      mot->>mot: acumula el consumo del CDR
+      mot-->>svc: líneas
+      opt PlanNoExiste o TarifaNoAplicable
+        svc->>svc: la fila va a cuarentena (Rechazo)
+      end
+    end
+    alt más del 50 % de filas rechazadas
+      svc->>bd: ROLLBACK y registrar lote FALLIDO
+      svc-->>cli: 422 LOTE_CORRUPTO
+    else dentro del umbral
+      svc->>bd: guardar CDR, líneas, consumo y rechazos
+      svc->>bd: actualizarResultado + COMMIT
+      svc-->>api: ResultadoIngesta
+      api-->>cli: 201 · aceptados y rechazados
+    end

@@ -1,4 +1,4 @@
-import { ServicioFacturacion, ServicioIngestaLotes } from '../application';
+import { ServicioFacturacion, ServicioIngestaLotes, ServicioSuscriptores } from '../application';
 import { RegistroEstrategias } from '../domain/estrategias';
 import { UnidadDeTrabajo } from '../domain/repositorios';
 
@@ -6,6 +6,7 @@ import { UnidadDeTrabajo } from '../domain/repositorios';
 export interface Dependencias {
   ingesta: Pick<ServicioIngestaLotes, 'ingestar'>;
   facturacion: Pick<ServicioFacturacion, 'generar'>;
+  suscriptores: Pick<ServicioSuscriptores, 'listar' | 'asignar'>;
   uow: UnidadDeTrabajo;
   registro: RegistroEstrategias;
 }

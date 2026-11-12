@@ -2,13 +2,13 @@ import { Router } from 'express';
 import multer from 'multer';
 import { LoteNoEncontrado } from '../domain/errores';
 import { Dependencias } from './dependencias';
-import { facturaDto, loteDto, planDto, rechazoDto } from './dto';
+import { facturaDto, loteDto, planDto, rechazoDto, suscriptorDto } from './dto';
 import { SolicitudInvalida } from './errores';
-import { consultaFactura, consultaRechazos, cuerpoPlan, validar } from './validacion';
+import { consultaFactura, consultaRechazos, cuerpoPlan, cuerpoSuscriptor, parametrosSuscriptor, validar } from './validacion';
 
 const TAMANO_MAXIMO = 10 * 1024 * 1024; // 10 MB: sobra para los 10.000 registros permitidos por lote
 
-export function crearRutas({ ingesta, facturacion, uow, registro }: Dependencias): Router {
+export function crearRutas({ ingesta, facturacion, suscriptores, uow, registro }: Dependencias): Router {
   const router = Router();
   const subida = multer({ storage: multer.memoryStorage(), limits: { fileSize: TAMANO_MAXIMO, files: 1 } });
 
@@ -49,6 +49,17 @@ export function crearRutas({ ingesta, facturacion, uow, registro }: Dependencias
     const { nombre, tipoEstrategia, parametros } = validar(cuerpoPlan, req.body);
     registro.crear(tipoEstrategia, parametros, nombre); // valida tipo y parámetros ANTES de guardar
     res.status(201).json(planDto(await uow.repos.planes.crear({ nombre, tipoEstrategia, parametros })));
+  });
+
+  // Suscriptores
+  router.get('/suscriptores', async (_req, res) => {
+    res.json((await suscriptores.listar()).map(suscriptorDto));
+  });
+
+  router.put('/suscriptores/:msisdn', async (req, res) => {
+    const { msisdn } = validar(parametrosSuscriptor, req.params);
+    const { nombre, plan } = validar(cuerpoSuscriptor, req.body);
+    res.json(suscriptorDto(await suscriptores.asignar(msisdn, nombre, plan)));
   });
 
   return router;

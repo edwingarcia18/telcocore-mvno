@@ -15,8 +15,9 @@ const registro = crearRegistroPorDefecto();
 const crear = (tipo: string, parametros: unknown) => registro.crear(tipo, parametros, 'Plan de prueba');
 
 describe('RegistroEstrategias y autodescubrimiento', () => {
-  it('descubre las tres estrategias a partir de los archivos *.strategy.ts', () => {
-    expect(registro.tiposRegistrados()).toEqual(['DATOS_FLEX', 'POSTPAGO_MIX', 'PREPAGO_CLASICO']);
+  it('descubre las tres estrategias base a partir de los archivos *.strategy.ts', () => {
+    // arrayContaining: la prueba sigue valiendo si además hay estrategias agregadas (por ejemplo, la de roaming de la demostración)
+    expect(registro.tiposRegistrados()).toEqual(expect.arrayContaining(['DATOS_FLEX', 'POSTPAGO_MIX', 'PREPAGO_CLASICO']));
   });
   it('un tipo no registrado lanza TipoEstrategiaDesconocido', () => {
     expect(() => registro.crear('INEXISTENTE', {}, 'x')).toThrow(TipoEstrategiaDesconocido);
@@ -63,10 +64,10 @@ describe('Principio abierto/cerrado', () => {
       .replace(/from '\.\//g, "from '../../src/domain/estrategias/");
     writeFileSync(join(dir, 'roaming.strategy.ts'), fuente);
     try {
-      const r = crearRegistroPorDefecto();
+      const r = new RegistroEstrategias(); // vacío: no depende de qué archivos haya en la carpeta de estrategias
       expect(r.tiene('ROAMING')).toBe(false);
       expect(descubrirEstrategias(r, dir)).toEqual(['roaming.strategy.ts']);
-      expect(r.tiposRegistrados()).toEqual(['DATOS_FLEX', 'POSTPAGO_MIX', 'PREPAGO_CLASICO', 'ROAMING']);
+      expect(r.tiposRegistrados()).toEqual(['ROAMING']);
 
       const roaming = r.crear('ROAMING', { vozPorSegundo: 6, smsPorMensaje: 200 }, 'Plan-Roaming');
       expect(resumen(roaming.tarificar(voz(10), contexto()))).toEqual(['Voz roaming|10|SEG|60']);

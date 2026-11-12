@@ -24,6 +24,8 @@ module.exports = {
     },
   ],
   collectCoverageFrom: ['src/domain/**/*.ts', 'src/application/**/*.ts', 'src/infrastructure/**/*.ts', 'src/http/**/*.ts', 'src/app.ts', 'src/composicion.ts', '!src/infrastructure/prisma/generated/**'],
+  // Informe: tabla en consola y página HTML navegable en coverage/index.html
+  coverageReporters: ['text', 'text-summary', 'html'],
   // Se exige al ejecutar `npm run test:cov` (criterio de la rúbrica: >= 80 %)
   coverageThreshold: { global: { statements: 80, branches: 80, functions: 80, lines: 80 } },
 };

@@ -1,0 +1,66 @@
+---
+title: "Jerarquía de CDR y lectura de lotes"
+---
+classDiagram
+  direction TB
+  classDef dominio fill:#F7FAD5,stroke:#8A9400,color:#1E2A00
+  classDef aplicacion fill:#EEF1D9,stroke:#5E6B00,color:#1E2A00
+  classDef infra fill:#F1F2F3,stroke:#808286,color:#2E3033
+  classDef http fill:#E8E9EA,stroke:#2E3033,color:#2E3033
+  classDef externo fill:#FFFFFF,stroke:#808286,color:#2E3033,stroke-dasharray:4
+  class AbstractCDR:::dominio {
+    <<abstract>>
+    +idExterno string
+    +msisdn string
+    +inicio Date
+    +periodo() string
+    +tipoServicio()* TipoServicio
+    +cantidadFacturable()* Dec
+  }
+  class VoiceCDR:::dominio {
+    +duracionSeg number
+    +tipoServicio() VOZ
+    +cantidadFacturable() segundos
+  }
+  class SMSCDR:::dominio {
+    +cantidad number
+    +tipoServicio() SMS
+    +cantidadFacturable() mensajes
+  }
+  class DataCDR:::dominio {
+    +bytes bigint
+    +tipoServicio() DATOS
+    +cantidadFacturable() MB exactos
+  }
+  class FabricaCDR:::infra {
+    +crear(datos) AbstractCDR
+  }
+  class ParserLote:::infra {
+    <<abstract>>
+    +formato* string
+    +parsear(contenido) List~FilaLeida~
+    #extraerFilas(contenido)* List~FilaCruda~
+  }
+  class ParserCSV:::infra {
+    #extraerFilas(contenido) List~FilaCruda~
+  }
+  class ParserJSON:::infra {
+    #extraerFilas(contenido) List~FilaCruda~
+  }
+  class FilaLeida:::infra {
+    <<tipo>>
+    +numeroFila number
+    +crudo string
+    +idExterno? string
+    +cdr? AbstractCDR
+    +error? ErrorDominio
+  }
+  AbstractCDR <|-- VoiceCDR
+  AbstractCDR <|-- SMSCDR
+  AbstractCDR <|-- DataCDR
+  ParserLote <|-- ParserCSV
+  ParserLote <|-- ParserJSON
+  ParserLote --> FabricaCDR : usa
+  FabricaCDR ..> AbstractCDR : crea
+  ParserLote ..> FilaLeida : produce
+  FilaLeida --> AbstractCDR : cdr (opcional)
