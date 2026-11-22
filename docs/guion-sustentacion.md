@@ -95,6 +95,16 @@ Resultados: el lote da **2 aceptados y 1 rechazado** (la fila de datos: el roami
 Remove-Item src\domain\estrategias\roaming.strategy.ts
 ```
 
+## Variante: hacer las demostraciones desde el panel
+
+Las mismas demostraciones se pueden hacer en <http://localhost:5173> sin escribir comandos, lo que se ve mejor en una
+proyección o desde el celular (consulta [`panel.md`](panel.md)):
+
+- **Demostración 1:** pantalla **Lotes** (elegir `test/fixtures/lote_dorado.csv` y «Procesar lote»), luego **Rechazos** y **Facturas**.
+  Subir el mismo archivo otra vez muestra el aviso de lote duplicado.
+- **Demostración 2:** pantalla **Planes** (crear el plan, copiar el archivo de la estrategia, volver a crearlo y asignarlo a un suscriptor).
+- Mantén una terminal con los comandos `curl.exe` como plan B si el panel falla.
+
 ## Preguntas probables y respuestas modelo
 
 | Pregunta | Respuesta |
