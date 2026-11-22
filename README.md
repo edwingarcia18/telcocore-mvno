@@ -20,7 +20,7 @@ npm run db:migrate          # crea las tablas
 npm run db:seed             # carga los 3 planes y 3 suscriptores de ejemplo
 npm test                    # 192 pruebas unitarias (sin base de datos)
 npm run test:integration    # 52 pruebas contra PostgreSQL real
-npm run dev                 # API (3000) + panel (5173) con recarga automática
+npm run dev                 # API (3000) + panel web (5173) con recarga automática
 ```
 
 Si el puerto 5432 de tu equipo está ocupado, pon `DB_PORT=5433` y el mismo puerto en `DATABASE_URL` dentro de `.env`.
@@ -60,6 +60,7 @@ src/
   infrastructure/  Lectores CSV/JSON y repositorios Prisma
   http/            Rutas, validación (zod), errores a HTTP, OpenAPI
 prisma/            Esquema, migraciones (con una restricción CHECK) y seed
+web/               Panel web (React + Vite): Lotes, Rechazos, Facturas y Planes
 test/              unit/ (sin base de datos) · integration/ (PostgreSQL real, incluye pruebas de contrato)
 docs/              Arquitectura, diagramas UML, OpenAPI, informe de calidad y guion de sustentación
 ```
@@ -75,6 +76,7 @@ Inyección de dependencias. Principios SOLID aplicados y comprobados con pruebas
 | [`docs/arquitectura.md`](docs/arquitectura.md) | 8 diagramas UML (imagen y Mermaid), patrones, decisiones y limitaciones |
 | [`docs/diagramas/`](docs/diagramas) | Imágenes `.png` y `.svg` y texto `.mmd` de cada diagrama |
 | [`docs/openapi.yaml`](docs/openapi.yaml) | Especificación OpenAPI 3 de la API |
+| [`docs/panel.md`](docs/panel.md) | El panel web: pantallas, decisiones de diseño y cómo probarlo desde el celular |
 | [`docs/informe-calidad.md`](docs/informe-calidad.md) | Pruebas, cobertura, mutación y defectos encontrados |
 | [`docs/guion-sustentacion.md`](docs/guion-sustentacion.md) | Guion de 12 minutos, demostraciones y preguntas probables |
 

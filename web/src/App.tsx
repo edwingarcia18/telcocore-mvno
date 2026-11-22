@@ -1,49 +1,74 @@
+import { BookOpen } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { CircleCheck, TriangleAlert, LoaderCircle } from 'lucide-react';
 import './styles.css';
+import { api } from './api';
+import { Logo } from './componentes/Logo';
+import { Navegacion } from './componentes/Navegacion';
+import { Pantalla, useRuta } from './lib/ruta';
+import { Facturas } from './pantallas/Facturas';
+import { Lotes } from './pantallas/Lotes';
+import { Planes } from './pantallas/Planes';
+import { Rechazos } from './pantallas/Rechazos';
 
-type Salud = { estado: string; servicio: string; hora: string };
+const TITULOS: Record<Pantalla, string> = { lotes: 'Lotes', rechazos: 'Rechazos', facturas: 'Facturas', planes: 'Planes' };
 
-function Logo() {
+/** Punto de color que indica si la API responde (se comprueba cada 15 segundos). */
+function EstadoApi() {
+  const [ok, setOk] = useState<boolean | null>(null);
+  useEffect(() => {
+    let vigente = true;
+    const probar = () => api.salud().then(() => vigente && setOk(true), () => vigente && setOk(false));
+    probar();
+    const temporizador = setInterval(probar, 15000);
+    return () => {
+      vigente = false;
+      clearInterval(temporizador);
+    };
+  }, []);
+  const texto = ok === null ? 'Comprobando…' : ok ? 'API operativa' : 'Sin conexión';
   return (
-    <svg width="170" height="44" viewBox="0 0 210 56" role="img" aria-label="TelcoCore MVNO">
-      <text x="0" y="46" fontFamily="Montserrat, Inter, sans-serif" fontWeight="800" fontSize="54" letterSpacing="-3" fill="#C7D309">tc</text>
-      <rect x="66" y="4" width="2" height="48" fill="#808286" />
-      <text x="78" y="26" fontFamily="Montserrat, Inter, sans-serif" fontWeight="500" fontSize="21" fill="#808286">TelcoCore</text>
-      <text x="78" y="49" fontFamily="Montserrat, Inter, sans-serif" fontWeight="500" fontSize="21" fill="#808286">MVNO</text>
-    </svg>
+    <span className="estado-api" role="status" aria-label={`Estado de la API: ${texto}`}>
+      <span className={`punto ${ok === null ? 'punto-neutro' : ok ? 'punto-ok' : 'punto-error'}`} aria-hidden="true" />
+      <span className="estado-api-texto">{texto}</span>
+    </span>
   );
 }
 
 export default function App() {
-  const [salud, setSalud] = useState<Salud | null>(null);
-  const [error, setError] = useState(false);
-
+  const { pantalla, params } = useRuta();
   useEffect(() => {
-    fetch('/api/health')
-      .then((r) => r.json())
-      .then(setSalud)
-      .catch(() => setError(true));
-  }, []);
+    document.title = `${TITULOS[pantalla]} · TelcoCore MVNO`;
+  }, [pantalla]);
 
   return (
-    <>
-      <header className="cabecera"><Logo /></header>
-      <main className="contenido">
-        <h1>Panel de operación</h1>
-        <section className="tarjeta">
-          {error ? (
-            <p className="estado error"><TriangleAlert /> La API no responde</p>
-          ) : salud ? (
-            <>
-              <p className="estado ok"><CircleCheck /> API operativa</p>
-              <p className="detalle">{salud.servicio} · {new Date(salud.hora).toLocaleTimeString('es-CO')}</p>
-            </>
-          ) : (
-            <p className="estado"><LoaderCircle className="girar" /> Conectando…</p>
-          )}
-        </section>
+    <div className="app">
+      <a
+        className="saltar"
+        href="#contenido"
+        onClick={(e) => {
+          e.preventDefault(); // el hash lo usa el enrutador: no se puede dejar que cambie
+          document.getElementById('contenido')?.focus();
+        }}
+      >
+        Saltar al contenido
+      </a>
+      <header className="cabecera">
+        <Logo ancho={140} />
+        <div className="cabecera-acciones">
+          <EstadoApi />
+          <a className="docs" href="/api/docs/" target="_blank" rel="noopener noreferrer" aria-label="Documentación de la API (se abre en otra pestaña)">
+            <BookOpen aria-hidden="true" />
+            <span>Documentación de la API</span>
+          </a>
+        </div>
+      </header>
+      <Navegacion actual={pantalla} />
+      <main id="contenido" className="contenido" tabIndex={-1}>
+        {pantalla === 'lotes' && <Lotes />}
+        {pantalla === 'rechazos' && <Rechazos params={params} />}
+        {pantalla === 'facturas' && <Facturas params={params} />}
+        {pantalla === 'planes' && <Planes />}
       </main>
-    </>
+    </div>
   );
 }

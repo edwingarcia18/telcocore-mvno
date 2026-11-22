@@ -131,7 +131,7 @@ alguna prueba fallara.
 
 ## 8. Límites de estas pruebas (lo que **no** garantizan)
 
-- No hay pruebas de interfaz en navegador: el panel web actual solo muestra el estado de la API.
+- **El panel web no tiene pruebas automatizadas en el repositorio.** Se verificó con un recorrido de 29 comprobaciones en un navegador simulado contra la API real; falta la revisión visual en navegadores reales (ver [`panel.md`](panel.md)).
 - La carga máxima probada es de **3.000 CDR** en un lote; el máximo permitido es 10.000.
 - La concurrencia se probó con 8 transacciones en paralelo sobre un mismo suscriptor, no con tráfico real.
 - Los diagramas Mermaid se validaron con el analizador oficial, pero su dibujado final depende de GitHub o de mermaid.live.
